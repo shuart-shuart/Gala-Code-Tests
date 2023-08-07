@@ -18,7 +18,7 @@
 
   <script>
     async function fetchLeaderboardData() {
-      const url = 'proxy.php'; // Point to your proxy.php script
+      const url = 'https://github.com/shuart-shuart/GalaCodeTests/blob/main/proxy.php'; // Point to your proxy.php script
       const response = await fetch(url);
       const csvData = await response.text();
       const rows = csvData.trim().split('\n');
