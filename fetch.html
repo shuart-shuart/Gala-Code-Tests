@@ -1,22 +1,36 @@
-r<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-  <title>Top Three Bidding Prices</title>
+  <title>Top Three Highest Values</title>
 </head>
 <body>
-  <h2>Top 3 Bidding Prices</h2>
-  <table id="topPricesTable">
-    <thead>
-      <tr>
-        <th>Rank</th>
-        <th>Name</th>
-        <th>Bidding Price (S$)</th>
-      </tr>
-    </thead>
-    <tbody id="dataBody"></tbody>
-  </table>
+  <h2>Top Three Highest Values</h2>
+  <ul id="topValuesList"></ul>
 
   <script>
-    async function fetchTopThreePrices() {
-      const apiKey = '40db074068f23356e4ff178e96672881f87f8234';
-      const sheetId = '1xiEQYGnKEHZmgLAZ
+    const spreadsheetId = '1xiEQYGnKEHZmgLAZv8zyBfl_5CVrbrD4cdcs3x0-FY0';
+    const range = 'Sheet1!B2:B'; // Column B, adjust the range as needed
+    const apiKey = '40db074068f23356e4ff178e96672881f87f8234';
+
+    async function fetchTopThreeValues() {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      const values = data.values.map(row => parseFloat(row[0]));
+      const sortedValues = values.sort((a, b) => b - a);
+      const topThreeValues = sortedValues.slice(0, 3);
+
+      const topValuesList = document.getElementById('topValuesList');
+
+      topThreeValues.forEach((value, index) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${index + 1}. ${value}`;
+        topValuesList.appendChild(listItem);
+      });
+    }
+
+    fetchTopThreeValues();
+  </script>
+</body>
+</html>
