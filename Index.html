@@ -1,20 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    table {
-      border-collapse: collapse;
-      width: 100%;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-  </style>
 </head>
 <body>
-  <table id="top-bids">
+  <table id="leaderboard">
     <thead>
       <tr>
         <th>Name</th>
@@ -25,42 +14,29 @@
   </table>
 
   <script>
-    async function fetchSheetData() {
-      const apiKey = 'YOUR_GOOGLE_API_KEY';
-      const sheetId = '1xiEQYGnKEHZmgLAZv8zyBfl_5CVrbrD4cdcs3x0-FY0';
-      const range = 'Sheet1!A2:B'; // Adjust the range as needed
-
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
-      const response = await fetch(url);
+    async function fetchLeaderboard() {
+      const response = await fetch('https://script.google.com/macros/s/WEB_APP_URL/exec');
       const data = await response.json();
-
-      return data.values.map(row => ({
-        name: row[0],
-        biddingPrice: parseFloat(row[1])
-      }));
+      return data;
     }
 
-    async function updateTable() {
-      const data = await fetchSheetData();
+    async function updateLeaderboard() {
+      const leaderboardData = await fetchLeaderboard();
+      const leaderboardTable = document.getElementById('leaderboard').getElementsByTagName('tbody')[0];
+      leaderboardTable.innerHTML = '';
 
-      data.sort((a, b) => b.biddingPrice - a.biddingPrice);
-      const top5 = data.slice(0, 5);
+      leaderboardData.forEach(entry => {
+        const row = leaderboardTable.insertRow();
+        const nameCell = row.insertCell(0);
+        const biddingPriceCell = row.insertCell(1);
 
-      const tbody = document.querySelector('#top-bids tbody');
-      tbody.innerHTML = '';
-
-      top5.forEach(row => {
-        const newRow = tbody.insertRow();
-        const nameCell = newRow.insertCell();
-        const priceCell = newRow.insertCell();
-
-        nameCell.textContent = row.name;
-        priceCell.textContent = row.biddingPrice.toFixed(2);
+        nameCell.textContent = entry[0];
+        biddingPriceCell.textContent = entry[1];
       });
     }
 
-    updateTable();
-    setInterval(updateTable, 1000); // Refresh every 1 second
+    updateLeaderboard();
+    setInterval(updateLeaderboard, 1000); // Refresh every 1 second
   </script>
 </body>
 </html>
