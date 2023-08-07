@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Top 3 Bidding Prices</title>
+  <title>Top Three Bidding Prices</title>
 </head>
 <body>
   <h2>Top Three Bidding Prices</h2>
@@ -9,6 +9,7 @@
     <thead>
       <tr>
         <th>Rank</th>
+        <th>Name</th>
         <th>Bidding Price (S$)</th>
       </tr>
     </thead>
@@ -18,33 +19,4 @@
   <script>
     async function fetchTopThreePrices() {
       const apiKey = '40db074068f23356e4ff178e96672881f87f8234';
-      const sheetId = '1xiEQYGnKEHZmgLAZv8zyBfl_5CVrbrD4cdcs3x0-FY0';
-      const range = 'Sheet1!B2:B'; // Adjust the range as needed
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
-
-      const response = await fetch(url);
-      const data = await response.json();
-
-      const prices = data.values.map(row => parseFloat(row[0]));
-      const sortedPrices = prices.sort((a, b) => b - a);
-      const topThreePrices = sortedPrices.slice(0, 3);
-
-      const tableBody = document.getElementById('dataBody');
-      tableBody.innerHTML = ''; // Clear existing data
-
-      topThreePrices.forEach((price, index) => {
-        const newRow = tableBody.insertRow();
-        const rankCell = newRow.insertCell();
-        const priceCell = newRow.insertCell();
-
-        rankCell.textContent = index + 1;
-        priceCell.textContent = price.toFixed(2);
-      });
-
-      setTimeout(fetchTopThreePrices, 200); // Refresh every 200ms (5 fps)
-    }
-
-    fetchTopThreePrices();
-  </script>
-</body>
-</html>
+      const sheetId = '1xiEQYGnKEHZmgLAZ
