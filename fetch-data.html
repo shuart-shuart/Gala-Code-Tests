@@ -1,46 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Fetch Google Sheets Data</title>
+  <title>Top Three Highest Bidding Prices</title>
 </head>
 <body>
-  <h2>Google Sheets Data</h2>
-  <table>
+  <h2>Top Three Highest Bidding Prices</h2>
+  <table id="topPricesTable">
     <thead>
       <tr>
-        <th>Name</th>
+        <th>Rank</th>
         <th>Bidding Price (S$)</th>
       </tr>
     </thead>
-    <tbody id="data-body"></tbody>
+    <tbody id="dataBody"></tbody>
   </table>
 
   <script>
-    async function fetchGoogleSheetsData() {
-      const url = 'https://docs.google.com/spreadsheets/d/1xiEQYGnKEHZmgLAZv8zyBfl_5CVrbrD4cdcs3x0-FY0/gviz/tq?tqx=out:csv&range=A2:B1000';
+    async function fetchTopThreePrices() {
+      const url = 'https://spreadsheets.google.com/feeds/cells/1xiEQYGnKEHZmgLAZv8zyBfl_5CVrbrD4cdcs3x0-FY0/1/public/full?alt=json';
       const response = await fetch(url);
-      const csvData = await response.text();
-      const rows = csvData.trim().split('\n');
-      
-      const data = rows.map(row => row.split(','));
-      return data;
-    }
+      const data = await response.json();
 
-    async function displayData() {
-      const data = await fetchGoogleSheetsData();
-      const tbody = document.getElementById('data-body');
+      const entries = data.feed.entry;
+      const prices = [];
 
-      data.forEach(row => {
-        const newRow = tbody.insertRow();
-        const nameCell = newRow.insertCell();
+      for (let i = 1; i < entries.length; i += 2) {
+        prices.push(parseFloat(entries[i].content.$t));
+      }
+
+      const sortedPrices = prices.sort((a, b) => b - a);
+      const topThreePrices = sortedPrices.slice(0, 3);
+
+      const tableBody = document.getElementById('dataBody');
+
+      topThreePrices.forEach((price, index) => {
+        const newRow = tableBody.insertRow();
+        const rankCell = newRow.insertCell();
         const priceCell = newRow.insertCell();
 
-        nameCell.textContent = row[0];
-        priceCell.textContent = row[1];
+        rankCell.textContent = index + 1;
+        priceCell.textContent = price.toFixed(2);
       });
     }
 
-    displayData();
+    fetchTopThreePrices();
   </script>
 </body>
 </html>
