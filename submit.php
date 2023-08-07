@@ -6,7 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (is_numeric($biddingPrice) && $biddingPrice >= 1500) {
         $csvData = "$name,$biddingPrice\n";
         
-        $file = fopen("BiddingData.csv", "a");
+        $file = fopen("/BiddingData.csv", "a");
         fwrite($file, $csvData);
         fclose($file);
         
