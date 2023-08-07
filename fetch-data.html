@@ -17,20 +17,15 @@
 
   <script>
     async function fetchTopThreePrices() {
-      const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR8DRxhvIYdC4CnO3zk-kH3fjcd0af6Hgxd5WF97-AzWGe15wBA8IVRUClTSGBPc1hKCMi49AKaH1Y5/pub?gid=0&single=true&output=csv';
+      const sheetId = '1xiEQYGnKEHZmgLAZv8zyBfl_5CVrbrD4cdcs3x0-FY0';
+      const range = 'Sheet1!B2:B'; // Adjust the range as needed
+      const apiKey = 'YOUR_GOOGLE_SHEETS_API_KEY';
+
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
       const response = await fetch(url);
-      const csvData = await response.text();
+      const data = await response.json();
 
-      const rows = csvData.split('\n');
-      const prices = [];
-
-      for (let i = 1; i < rows.length; i++) {
-        const columns = rows[i].split(',');
-        if (columns.length >= 2) {
-          prices.push(parseFloat(columns[1]));
-        }
-      }
-
+      const prices = data.values.map(row => parseFloat(row[0]));
       const sortedPrices = prices.sort((a, b) => b - a);
       const topThreePrices = sortedPrices.slice(0, 3);
 
