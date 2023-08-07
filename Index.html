@@ -26,24 +26,21 @@
 
   <script>
     async function fetchSheetData() {
-      const url = 'https://docs.google.com/spreadsheets/d/1xiEQYGnKEHZmgLAZv8zyBfl_5CVrbrD4cdcs3x0-FY0/edit#gid=0';
+      const spreadsheetId = '1xiEQYGnKEHZmgLAZv8zyBfl_5CVrbrD4cdcs3x0-FY0';
+      const apiKey = ''; // Leave empty if public, or add your API key
+      const range = 'Sheet1!A2:B'; // Adjust the range as needed
+
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
       const response = await fetch(url);
-      const htmlData = await response.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlData, 'text/html');
-      const tableRows = doc.querySelectorAll('table tr');
+      const data = await response.json();
 
-      const data = [];
-      tableRows.forEach(row => {
-        const columns = row.querySelectorAll('td');
-        if (columns.length >= 2) {
-          const name = columns[0].textContent;
-          const biddingPrice = parseFloat(columns[1].textContent);
-          data.push({ name, biddingPrice });
-        }
-      });
-
-      return data;
+      if (data.values) {
+        return data.values.map(row => ({
+          name: row[0],
+          biddingPrice: parseFloat(row[1])
+        }));
+      }
+      return [];
     }
 
     async function updateTable() {
@@ -66,7 +63,7 @@
     }
 
     updateTable();
-setInterval(updateTable, 1000); // Refresh every 1 second
+    setInterval(updateTable, 10000); // Refresh every 10 seconds
   </script>
 </body>
 </html>
