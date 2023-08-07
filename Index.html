@@ -1,21 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bidding Data Collection</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
 </head>
 <body>
-  <h1>Bidding Data Collection Form</h1>
-  
-  <form action="https://github.com/shuart-shuart/GalaCodeTests/issues/new" method="POST">
-    <input type="hidden" name="title" value="New Bidding Entry">
-    
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="body" required><br><br>
-    
-    <label for="bidding-price">Bidding Price (S$) (Above 1500):</label>
-    <input type="number" id="bidding-price" name="body" min="1501" step="0.01" required><br><br>
-    
-    <input type="submit" value="Submit">
-  </form>
+  <table id="top-bids">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Bidding Price</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchSheetData() {
+      const apiKey = 'YOUR_GOOGLE_API_KEY';
+      const sheetId = '1xiEQYGnKEHZmgLAZv8zyBfl_5CVrbrD4cdcs3x0-FY0';
+      const range = 'Sheet1!A2:B'; // Adjust the range as needed
+
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      return data.values.map(row => ({
+        name: row[0],
+        biddingPrice: parseFloat(row[1])
+      }));
+    }
+
+    async function updateTable() {
+      const data = await fetchSheetData();
+
+      data.sort((a, b) => b.biddingPrice - a.biddingPrice);
+      const top5 = data.slice(0, 5);
+
+      const tbody = document.querySelector('#top-bids tbody');
+      tbody.innerHTML = '';
+
+      top5.forEach(row => {
+        const newRow = tbody.insertRow();
+        const nameCell = newRow.insertCell();
+        const priceCell = newRow.insertCell();
+
+        nameCell.textContent = row.name;
+        priceCell.textContent = row.biddingPrice.toFixed(2);
+      });
+    }
+
+    updateTable();
+    setInterval(updateTable, 1000); // Refresh every 1 second
+  </script>
 </body>
 </html>
