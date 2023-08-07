@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bidding Leaderboard</title>
+  <meta http-equiv="refresh" content="1">
+</head>
+<body>
+  <h2>Bidding Leaderboard (Top 3)</h2>
+  <table id="leaderboard">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Bidding Price (S$)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchLeaderboardData() {
+      const url = 'BiddingData.csv';
+      const response = await fetch(url);
+      const csvData = await response.text();
+      const rows = csvData.trim().split('\n');
+      
+      const data = rows.map(row => {
+        const [name, biddingPrice] = row.split(',');
+        return { name, biddingPrice: parseFloat(biddingPrice) };
+      });
+      
+      return data.sort((a, b) => b.biddingPrice - a.biddingPrice).slice(0, 3);
+    }
+
+    async function updateLeaderboard() {
+      const leaderboardData = await fetchLeaderboardData();
+      const tbody = document.querySelector('#leaderboard tbody');
+      tbody.innerHTML = '';
+
+      leaderboardData.forEach(row => {
+        const newRow = tbody.insertRow();
+        const nameCell = newRow.insertCell();
+        const priceCell = newRow.insertCell();
+
+        nameCell.textContent = row.name;
+        priceCell.textContent = row.biddingPrice.toFixed(2);
+      });
+    }
+
+    updateLeaderboard();
+  </script>
+</body>
+</html>
