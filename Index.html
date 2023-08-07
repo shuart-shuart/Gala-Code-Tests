@@ -1,69 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    table {
-      border-collapse: collapse;
-      width: 100%;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-  </style>
+  <title>Bidding Form</title>
 </head>
 <body>
-  <table id="top-bids">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Bidding Price</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <h2>Enter Bidding Information</h2>
+  <form id="bidding-form">
+    <label for="name">Name:</label>
+    <input type="text" id="name" required><br><br>
+    <label for="bidding-price">Bidding Price (S$):</label>
+    <input type="number" id="bidding-price" step="0.01" min="1500" required><br><br>
+    <button type="submit">Submit</button>
+    <p id="error-message" style="color: red; display: none;"></p>
+  </form>
 
   <script>
-    async function fetchSheetData() {
-      const spreadsheetId = '1xiEQYGnKEHZmgLAZv8zyBfl_5CVrbrD4cdcs3x0-FY0';
-      const apiKey = ''; // Leave empty if public, or add your API key
-      const range = 'Sheet1!A2:B'; // Adjust the range as needed
+    document.addEventListener('DOMContentLoaded', function() {
+      const biddingForm = document.getElementById('bidding-form');
+      const errorMessage = document.getElementById('error-message');
 
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
-      const response = await fetch(url);
-      const data = await response.json();
+      biddingForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const name = document.getElementById('name').value;
+        const biddingPrice = parseFloat(document.getElementById('bidding-price').value);
 
-      if (data.values) {
-        return data.values.map(row => ({
-          name: row[0],
-          biddingPrice: parseFloat(row[1])
-        }));
-      }
-      return [];
-    }
-
-    async function updateTable() {
-      const data = await fetchSheetData();
-
-      data.sort((a, b) => b.biddingPrice - a.biddingPrice);
-      const top5 = data.slice(0, 5);
-
-      const tbody = document.querySelector('#top-bids tbody');
-      tbody.innerHTML = '';
-
-      top5.forEach(row => {
-        const newRow = tbody.insertRow();
-        const nameCell = newRow.insertCell();
-        const priceCell = newRow.insertCell();
-
-        nameCell.textContent = row.name;
-        priceCell.textContent = row.biddingPrice.toFixed(2);
+        if (!isNaN(biddingPrice) && biddingPrice >= 1500) {
+          const csvData = `${name},${biddingPrice}\n`;
+          downloadCSV('Data.csv', csvData);
+          alert('Data submitted successfully!');
+          biddingForm.reset();
+          errorMessage.style.display = 'none';
+        } else {
+          errorMessage.textContent = 'Please enter a minimum bid of S$1500, thank you!';
+          errorMessage.style.display = 'block';
+        }
       });
-    }
 
-    updateTable();
-    setInterval(updateTable, 10000); // Refresh every 10 seconds
+      function downloadCSV(filename, text) {
+        const element = document.createElement('a');
+        element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+      }
+    });
   </script>
 </body>
 </html>
