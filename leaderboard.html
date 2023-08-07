@@ -18,7 +18,7 @@
 
   <script>
     async function fetchLeaderboardData() {
-      const url = 'https://docs.google.com/spreadsheets/d/1B_bqGGqrtBrM8aNIaHsmsbIjeGA7KH3vet-DptWE0NM/edit?usp=sharing';
+      const url = 'proxy.php'; // Point to your proxy.php script
       const response = await fetch(url);
       const csvData = await response.text();
       const rows = csvData.trim().split('\n');
