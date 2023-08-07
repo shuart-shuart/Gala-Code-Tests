@@ -18,7 +18,7 @@
 
   <script>
     async function fetchLeaderboardData() {
-      const url = 'BiddingData.csv';
+      const url = 'https://docs.google.com/spreadsheets/d/1B_bqGGqrtBrM8aNIaHsmsbIjeGA7KH3vet-DptWE0NM/edit?usp=sharing';
       const response = await fetch(url);
       const csvData = await response.text();
       const rows = csvData.trim().split('\n');
